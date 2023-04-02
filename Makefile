@@ -1,5 +1,23 @@
+C_FILES = $(shell find . -type f -name '*.c')
 ASM_FILES = $(shell find . -type f -name '*.s')
 OBJECTS = ${C_FILES:.c=.o} ${ASM_FILES:.s=.o}
+
+CC = gcc
+# -m32: sets int, long, and pointer types to 32 bits, and generates code that runs on any i386 system.
+# -nostdlib: do not use the standard system startup files or libraries when linking.
+# -nostdinc: do not search the standard system directories for header files.
+# -fno-builtin: don’t recognize built-in functions that do not begin with ‘__builtin_’ as prefix.
+# -fno-stack-protector: disables the compiler's built-in stack protection mechanisms.
+# -nostartfiles: do not use the standard system startup files when linking.
+# -nodefaultlibs: do not use the standard system libraries when linking.
+# -Wall: this enables all the warnings about constructions that some users consider questionable, \
+#		 and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
+# -Wextra: this enables some extra warning flags that are not enabled by -Wall.
+# -Werror: make all warnings into errors.
+# -c: compile or assemble the source files, but do not link. The linking stage simply is not done. \
+ 	  The ultimate output is in the form of an object file for each source file.
+CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
+		 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
 
 # -melf_i386: indicates that the output file should be in the ELF format for the Intel 386 architecture.
 # -T: specify the linker script to use for the link-edit process.
@@ -38,6 +56,9 @@ os.iso: kernel.elf
 
 run: os.iso
 	bochs -f bochsrc.txt -q
+
+%.o: %.c
+	$(CC) $(CFLAGS)  $< -o $@
 
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
