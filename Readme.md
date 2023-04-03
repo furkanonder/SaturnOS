@@ -9,5 +9,6 @@ make run
 ```
 
 ## References
+* https://wiki.osdev.org/
 * https://linux.die.net
 * https://gcc.gnu.org/
