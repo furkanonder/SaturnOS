@@ -58,7 +58,7 @@ run: os.iso
 	bochs -f bochsrc.txt -q
 
 %.o: %.c
-	$(CC) $(CFLAGS)  $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
