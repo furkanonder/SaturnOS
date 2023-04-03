@@ -1,4 +1,10 @@
 #include "../include/framebuffer.h"
+#include "../include/string.h"
+#include "../include/stdint.h"
+#include "../include/io.h"
+
+static unsigned int fb_col = 0;
+static unsigned int fb_row = 0;
 
 /** fb_write_cell:
  *  Writes a character with the given foreground and background to position i in the frame buffer.
@@ -37,4 +43,64 @@ void fb_move_cursor(unsigned short pos) {
     outb(FB_DATA_PORT, ((pos >> 8) & 0x00FF));
     outb(FB_COMMAND_PORT, FB_LOW_BYTE_COMMAND);
     outb(FB_DATA_PORT, pos & 0x00FF);
+}
+
+// Clears the frame buffer
+void fb_clear() {
+    for(size_t i=0; i < FB_WIDTH * FB_HEIGHT; i++) {
+        fb_write_cell(i, ' ', FB_BLACK, FB_BLACK);
+    }
+    fb_move_cursor(0);
+    fb_col = 0;
+    fb_row = 0;
+}
+
+// Adds new line to frame buffer
+void fb_new_line() {
+    while(FB_WIDTH - 1 != fb_col) {
+        fb_write_cell(fb_col, ' ', FB_BLACK, FB_BLACK);
+        fb_col++;
+    }
+    fb_col = 0;
+    fb_row++;
+    fb_move_cursor(fb_col + (fb_row * FB_WIDTH));
+}
+
+// Shifts one row the framebuffer
+void fb_scroll_down() {
+    // Each cell has 16 bits.
+    uint16_t *fb = (uint16_t *) FRAME_BUFFER_ADDRESS;
+    // One row can contain 80(FB_WIDTH) cell, shift one row framebuffer to add new line.
+    memmove(fb, fb + FB_WIDTH, (FB_WIDTH * 2) * (FB_HEIGHT * 2));
+}
+
+/** fb_write_str:
+ *  Writes a character array to the frame buffer.
+ *
+ *  @param buf  Character array
+ */
+void fb_write_str(char *buf) {
+
+    for(size_t i=0; i < strlen(buf); i++) {
+        char c = buf[i];
+
+        if (c == '\n') {
+            fb_new_line();
+        }
+        else {
+            fb_write_cell(fb_col + (fb_row * FB_WIDTH), c, FB_WHITE, FB_BLACK);
+            fb_col++;
+        }
+
+        if (fb_col == FB_WIDTH - 1) {
+            fb_row++;
+            fb_col = 0;
+        }
+        if (fb_row == FB_HEIGHT - 1) {
+            fb_scroll_down();
+            fb_row--;
+        }
+        fb_move_cursor(fb_col + (fb_row * FB_WIDTH));
+    }
+
 }
