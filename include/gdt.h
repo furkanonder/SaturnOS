@@ -32,8 +32,8 @@
  * Content: | G |  DB |  L  |  reserved  |
  *
  * Access Bytes
- * Bit:     |  15  |  14  13 |  12  | 11  10  9  8   |
- * Content: |  P   |   DPL   |  S   |      Type     |
+ * Bit:     |  15  |  14  13 |  12  | 11  10  9  8 |
+ * Content: |  P   |   DPL   |  S   |     Type     |
  *
  * Type
  * Bit:     |  11 |  10  |   9  |  8  |
@@ -114,6 +114,6 @@ struct gdt {
     uint32_t size;
 } __attribute__((packed));
 
-extern void setup_gdt();
+extern void init_gdt();
 
 #endif

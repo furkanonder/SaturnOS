@@ -4,7 +4,6 @@ global gdt_flush    ; make the label gdt_flush visible outside this file
 ; stack: [esp + 4] the address of the first entry in the GDT
 ;        [esp    ] the return address
 gdt_flush:
-    cli                 ; clear the interrupt flag
     mov eax, [esp + 4]  ; load the address of the GDT into register eax
     lgdt [eax]          ; load the GDT
 
