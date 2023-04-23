@@ -16,13 +16,13 @@ struct gdt gdt_pointer;
  * @param access_byte The access byte for the GDT to identify access.
  * @param flags Flags for setting the segment descriptor.
  */
-static void gdt_set_gate(int32_t index, uint32_t base, uint32_t limit, uint8_t access_byte, uint8_t flags) {
+static void gdt_set_gate(int32_t index, uint32_t base, uint32_t limit, uint8_t access_byte, unsigned flags) {
     gdt_entries[index].base_addr_low        = (base  & 0xFFFF);
     gdt_entries[index].base_addr_middle     = (base >> 16) & 0xFF;
     gdt_entries[index].base_addr_high       = (base >> 24) & 0xFF;
     gdt_entries[index].segment_limit_low    = (limit & 0xFFFF);
     gdt_entries[index].segment_limit_high   = ((limit >> 16) & 0x0F);
-    gdt_entries[index].flags                = flags >> 4;
+    gdt_entries[index].flags                = flags;
     gdt_entries[index].access_byte          = access_byte;
 }
 
@@ -78,8 +78,8 @@ void init_gdt() {
      * Flags
      * Bit:     |  3  |  2  |  1  |     0      |
      * Content: |  G  |  DB |  L  |  reserved  |
-     * Value:   |  1  |  1  |  0  |     0      | = 1100 1111 = 0xCF */
-    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
+     * Value:   |  1  |  1  |  0  |     0      | = 1100 */
+    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0b1100);
 
     /* Data Segment
      *
@@ -106,8 +106,8 @@ void init_gdt() {
      * Flags
      * Bit:     |  3  |  2  |  1  |     0      |
      * Content: |  G  |  DB |  L  |  reserved  |
-     * Value:   |  1  |  1  |  0  |     0      | = 1100 1111 = 0xCF */
-    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
+     * Value:   |  1  |  1  |  0  |     0      | = 1100 */
+    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0b1100);
 
     // Flush out the old GDT and install the new changes!
     gdt_flush((uint32_t) &gdt_pointer);
