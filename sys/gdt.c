@@ -1,8 +1,9 @@
 #include "../include/gdt.h"
 
-// Defined in asm/gdt_flush.s
+// Defined in asm/gdt_flush.s We use this to properly reload the new segment registers.
 extern void gdt_flush(uint32_t);
 
+/* Our GDT, with 3 entries, and finally our special GDT pointer */
 struct gdt_entry gdt_entries[GDT_ENTRY_COUNT];
 struct gdt gdt_pointer;
 
@@ -38,7 +39,13 @@ static void gdt_set_gate(int32_t index, uint32_t base, uint32_t limit, uint8_t a
  * particular address. ROM (EPROM) is generally located at the top of the physical address space, because the processor
  * begins execution at FFFF_FFF0H. RAM (DRAM) is placed at the bottom of the address space because the initial base
  * address for the DS data segment after reset initialization is 0. */
+
+/** init_gdt:
+ * This function will set up the special GDT pointer, set up the first 3 entries in our GDT, and then finally call
+ * gdt_flush() in our assembler file in order to tell the processor where the new GDT is and update the new segment
+ * registers */
 void init_gdt() {
+    // Set up the GDT pointer
     gdt_pointer.address = (sizeof(struct gdt_entry) * GDT_ENTRY_COUNT) - 1;
     gdt_pointer.size = (unsigned int) &gdt_entries;
 
@@ -102,5 +109,6 @@ void init_gdt() {
      * Value:   |  1  |  1  |  0  |     0      | = 1100 1111 = 0xCF */
     gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
 
+    // Flush out the old GDT and install the new changes!
     gdt_flush((uint32_t) &gdt_pointer);
 }
