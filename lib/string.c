@@ -31,3 +31,18 @@ void *memmove(void *dst, const void *src, size_t n) {
 
     return d;
 }
+
+/** memset:
+ * Sets the first n bytes of the block of memory pointed by dest to the specified value.
+ * @param dest  Pointer to the block of memory to fill.
+ * @param value Value to be set.
+ * @param n Number of bytes to be set to the value.
+ * @return ptr
+ */
+void *memset(void *dest, int value, size_t n) {
+    char *ptr = (char *)dest;
+    while(n-- > 0) {
+        *ptr++ = value;
+    }
+    return ptr;
+}
