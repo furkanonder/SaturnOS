@@ -2,6 +2,7 @@
 #include "../include/string.h"
 #include "../include/stdint.h"
 #include "../include/io.h"
+#include "../include/stdarg.h"
 
 static unsigned int fb_col = 0;
 static unsigned int fb_row = 0;
@@ -45,9 +46,11 @@ void fb_move_cursor(unsigned short pos) {
     outb(FB_DATA_PORT, pos & 0x00FF);
 }
 
-// Clears the frame buffer
+/** fb_clear:
+ *  Clears the frame buffer
+ */
 void fb_clear() {
-    for(size_t i=0; i < FB_WIDTH * FB_HEIGHT; i++) {
+    for(int i=0; i < FB_WIDTH * FB_HEIGHT; i++) {
         fb_write_cell(i, ' ', FB_BLACK, FB_BLACK);
     }
     fb_move_cursor(0);
@@ -55,7 +58,9 @@ void fb_clear() {
     fb_row = 0;
 }
 
-// Adds new line to frame buffer
+/** fb_new_line:
+ *  Adds new line to frame buffer
+ */
 void fb_new_line() {
     while(FB_WIDTH - 1 != fb_col) {
         fb_write_cell(fb_col, ' ', FB_BLACK, FB_BLACK);
@@ -66,7 +71,9 @@ void fb_new_line() {
     fb_move_cursor(fb_col + (fb_row * FB_WIDTH));
 }
 
-// Shifts one row the framebuffer
+/** fb_scroll_down:
+ *  Shifts one row the framebuffer
+ */
 void fb_scroll_down() {
     // Each cell has 16 bits.
     uint16_t *fb = (uint16_t *) FRAME_BUFFER_ADDRESS;
@@ -103,4 +110,49 @@ void fb_write_str(char *buf) {
         fb_move_cursor(fb_col + (fb_row * FB_WIDTH));
     }
 
+}
+
+/** fb_write_char:
+ *  Writes a character to the frame buffer.
+ *  @param c
+ */
+void fb_write_char(unsigned char c) {
+    char buf[] = {c, '\0'};
+    fb_write_str(buf);
+}
+
+/** os_printf:
+ *  Writes the string pointed by format to frame buffer. If format includes format specifiers
+ *  (subsequences beginning with %), the additional arguments following format are formatted and inserted in the
+ *  resulting string replacing their respective specifiers.
+ *
+ * @param format C string that contains the text to be written to frame buffer.
+ */
+void os_printf(const char *format, ...) {
+    char buf[20];
+    va_list ap;
+    va_start(ap, format);
+
+    for(size_t i=0; i < strlen(format); i++) {
+        if(format[i] == '%') {
+            char *arg = '\0';
+
+            switch(format[++i]) {
+                case 'd':
+                    arg = itoa(va_arg(ap, int), buf, 10);
+                    break;
+                case 'x':
+                    arg = itoa(va_arg(ap, int), buf, 16);
+                    break;
+                default:
+                    break;
+            }
+            fb_write_str(arg);
+        }
+        else {
+            fb_write_char(format[i]);
+        }
+    }
+
+    va_end(ap);
 }

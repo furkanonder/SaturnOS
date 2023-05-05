@@ -34,5 +34,6 @@
 void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg);
 void fb_write_str(char *buf);
 void fb_clear();
+void os_printf(const char *format, ...);
 
 #endif
