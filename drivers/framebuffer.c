@@ -4,8 +4,7 @@
 #include "../include/io.h"
 #include "../include/stdarg.h"
 
-static unsigned int fb_col = 0;
-static unsigned int fb_row = 0;
+char *fb = (char *) FRAME_BUFFER_ADDRESS;
 
 /** fb_write_cell:
  *  Writes a character with the given foreground and background to position i in the frame buffer.
@@ -19,11 +18,8 @@ static unsigned int fb_row = 0;
  *  Content: |      BG     |     FG    |      ASCII      |
  */
 void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg) {
-    char *fb = (char *) FRAME_BUFFER_ADDRESS;
-    unsigned int loc = i * 2;
-
-    fb[loc] = c;
-    fb[loc + 1] = ((bg & 0x0F) << 4) | (fg & 0x0F);
+    fb[i] = c;
+    fb[i + 1] = ((bg & 0x0F) << 4) | (fg & 0x0F);
 }
 
 /** fb_move_cursor:
@@ -51,24 +47,25 @@ void fb_move_cursor(unsigned short pos) {
  */
 void fb_clear() {
     for(int i=0; i < FB_WIDTH * FB_HEIGHT; i++) {
-        fb_write_cell(i, ' ', FB_BLACK, FB_BLACK);
+        fb_write_cell(i * 2, ' ', FB_BLACK, FB_BLACK);
     }
     fb_move_cursor(0);
-    fb_col = 0;
-    fb_row = 0;
 }
 
-/** fb_new_line:
- *  Adds new line to frame buffer
+/** get_cursor_loc:
+ *  Returns the cursor position.
+ *
+ *  @return cursor position
  */
-void fb_new_line() {
-    while(FB_WIDTH - 1 != fb_col) {
-        fb_write_cell(fb_col, ' ', FB_BLACK, FB_BLACK);
-        fb_col++;
-    }
-    fb_col = 0;
-    fb_row++;
-    fb_move_cursor(fb_col + (fb_row * FB_WIDTH));
+uint16_t get_cursor_loc() {
+    uint16_t pos = 0;
+
+    outb(FB_COMMAND_PORT, CURSOR_LOCATION_LOW);
+    pos |= inb(FB_DATA_PORT);
+    outb(FB_COMMAND_PORT, CURSOR_LOCATION_HIGH);
+    pos |= inb(FB_DATA_PORT) << 8;
+
+    return pos;
 }
 
 /** fb_scroll_down:
@@ -84,37 +81,32 @@ void fb_scroll_down() {
 /** fb_write_str:
  *  Writes a character array to the frame buffer.
  *
- *  @param buf  Character array
+ *  @param buf Character array
  */
 void fb_write_str(char *buf) {
+    uint16_t cursor_position = get_cursor_loc() * 2;
 
     for(size_t i=0; i < strlen(buf); i++) {
-        char c = buf[i];
+        if(cursor_position >= FB_WIDTH * FB_HEIGHT * 2){
+            fb_scroll_down();
+            cursor_position -= FB_WIDTH * 2;
+        }
 
-        if (c == '\n') {
-            fb_new_line();
+        if (buf[i] == '\n') {
+            cursor_position = (cursor_position + FB_WIDTH * 2) - (cursor_position % (FB_WIDTH * 2));
         }
         else {
-            fb_write_cell(fb_col + (fb_row * FB_WIDTH), c, FB_WHITE, FB_BLACK);
-            fb_col++;
+            fb_write_cell(cursor_position, buf[i], FB_WHITE, FB_BLACK);
+            cursor_position += 2;
         }
-
-        if (fb_col == FB_WIDTH - 1) {
-            fb_row++;
-            fb_col = 0;
-        }
-        if (fb_row == FB_HEIGHT - 1) {
-            fb_scroll_down();
-            fb_row--;
-        }
-        fb_move_cursor(fb_col + (fb_row * FB_WIDTH));
     }
 
+    fb_move_cursor(cursor_position / 2);
 }
 
 /** fb_write_char:
  *  Writes a character to the frame buffer.
- *  @param c
+ *  @param c Character
  */
 void fb_write_char(unsigned char c) {
     char buf[] = {c, '\0'};

@@ -27,6 +27,10 @@
 #define FB_COMMAND_PORT         0x3D4
 #define FB_DATA_PORT            0x3D5
 
+// Cursor Ports
+#define CURSOR_LOCATION_HIGH    0x0E
+#define CURSOR_LOCATION_LOW     0x0F
+
 // The Framebuffer I/O port commands
 #define FB_HIGH_BYTE_COMMAND    14
 #define FB_LOW_BYTE_COMMAND     15
