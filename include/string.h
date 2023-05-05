@@ -6,5 +6,6 @@
 size_t strlen(const char *s);
 void *memmove(void *dst, const void *src, size_t n);
 void *memset(void *dest, int value, size_t n);
+char* itoa(int value, char* str, int base);
 
 #endif
