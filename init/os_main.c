@@ -9,4 +9,6 @@ void os_main() {
     serial_write_str("test");
     init_gdt();
     init_idt();
+
+     asm volatile ("int $0x3");
 }
