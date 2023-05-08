@@ -1,10 +1,10 @@
-#include "../include/framebuffer.h"
-#include "../include/string.h"
-#include "../include/stdint.h"
-#include "../include/io.h"
-#include "../include/stdarg.h"
+#include "framebuffer.h"
+#include "../../include/string.h"
+#include "../../include/stdint.h"
+#include "../io/io.h"
+#include "../../include/stdarg.h"
 
-char *fb = (char *) FRAME_BUFFER_ADDRESS;
+static char *fb = (char *) FRAME_BUFFER_ADDRESS;
 
 /** fb_write_cell:
  *  Writes a character with the given foreground and background to position i in the frame buffer.

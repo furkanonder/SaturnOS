@@ -1,9 +1,9 @@
 #ifndef __ISR_H__
 #define __ISR_H__
 
-#include "../include/stdint.h"
+#include "../../include/stdint.h"
 
-// Popped registers from the stack by common_interrupt_handler(defined in asm/interrupt_handler.s)
+// Popped registers from the stack by common_interrupt_handler(defined in interrupt_handler.s)
 struct cpu_state {
     uint32_t eax;
     uint32_t ebx;
@@ -35,7 +35,7 @@ struct stack_state {
     uint32_t eflags;
 } __attribute__ ((packed));
 
-extern void register_handler(int interrupt, void (*handler)());
+extern void register_interrupt_handler(int interrupt, void (*handler)());
 
 extern void interrupt_handler_0(void);
 extern void interrupt_handler_1(void);

@@ -1,6 +1,6 @@
-#include "../include/gdt.h"
+#include "gdt.h"
 
-// Defined in asm/gdt_flush.s We use this to properly reload the new segment registers.
+// Defined in gdt_flush.s We use this to properly reload the new segment registers.
 extern void gdt_flush(uint32_t);
 
 /* Our GDT, with 3 entries, and finally our special GDT pointer */

@@ -1,7 +1,7 @@
-#include "../include/framebuffer.h"
-#include "../include/serial.h"
-#include "../include/gdt.h"
-#include "../include/idt.h"
+#include "../drivers/framebuffer/framebuffer.h"
+#include "../drivers/serial/serial.h"
+#include "../mm/segmentation/gdt.h"
+#include "../drivers/interrupts/idt.h"
 
 void os_main() {
     fb_clear();

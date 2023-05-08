@@ -1,6 +1,7 @@
 #ifndef __FRAMEBUFFER_H__
 #define __FRAMEBUFFER_H__
 
+// Color codes for the frame buffer
 #define FB_BLACK          0
 #define FB_BLUE           1
 #define FB_GREEN          2

@@ -1,6 +1,6 @@
-#include "../include/idt.h"
-#include "../include/isr.h"
-#include "../include/string.h"
+#include "idt.h"
+#include "isr.h"
+#include "../../include/string.h"
 
 /* To aid in handling exceptions and interrupts, each architecturally defined exception and each interrupt condition
  * requiring special handling by the processor is assigned a unique identification number, called a vector number. The
@@ -12,7 +12,7 @@
 struct idt_entry idt_entries[256];
 struct idt idt_ptr;
 
-// Defined in asm/idt_loader.s, and is used to load the IDT.
+// Defined in idt_loader.s, and is used to load the IDT.
 extern int load_idt(void*);
 
 /** idt_set_gate:

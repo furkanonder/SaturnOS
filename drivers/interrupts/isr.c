@@ -1,5 +1,5 @@
-#include "../include/isr.h"
-#include "../include/framebuffer.h"
+#include "isr.h"
+#include "../framebuffer/framebuffer.h"
 
 // Array of function pointers to store 256 function pointers
 void (*interrupt_handlers[256]) ();
@@ -9,7 +9,7 @@ void (*interrupt_handlers[256]) ();
  *  corresponding to the given interrupt number. If the interrupt number is less than 32, it writes the interrupt
  *  number, cpu_state and stack_state and enters an endless loop.
  *
- * @param cpu  Popped registers from the stack by common_interrupt_handler(defined in asm/interrupt_handler.s)
+ * @param cpu  Popped registers from the stack by common_interrupt_handler(defined in interrupt_handler.s)
  * @param interrupt Occured Interrupt number
  * @param stack Stack at the time of the interrupt
  */
@@ -34,12 +34,12 @@ void interrupt_handler(struct cpu_state cpu, int interrupt, struct stack_state s
     interrupt_handlers[interrupt](interrupt);
 }
 
-/** register_handler:
+/** register_interrupt_handler:
  * Stores the function pointer in the interrupt_handlers array at the index corresponding to the given interrupt number.
  *
  * @param interrupt  An interrupt number stored in the Interrupt Descriptor Table
  * @param handler   function to handle the given interrupt.
  */
-void register_handler(int interrupt, void (*handler)()) {
+void register_interrupt_handler(int interrupt, void (*handler)()) {
     interrupt_handlers[interrupt] = handler;
 }
