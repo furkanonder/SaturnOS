@@ -36,6 +36,7 @@ struct stack_state {
 } __attribute__ ((packed));
 
 extern void register_interrupt_handler(int interrupt, void (*handler)());
+void register_interrupt_handler(int interrupt, void (*handler)());
 
 extern void interrupt_handler_0(void);
 extern void interrupt_handler_1(void);

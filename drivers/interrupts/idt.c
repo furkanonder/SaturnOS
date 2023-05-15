@@ -1,6 +1,7 @@
 #include "idt.h"
 #include "isr.h"
 #include "../../include/string.h"
+#include "../pic/pic.h"
 
 /* To aid in handling exceptions and interrupts, each architecturally defined exception and each interrupt condition
  * requiring special handling by the processor is assigned a unique identification number, called a vector number. The
@@ -87,6 +88,9 @@ void init_idt() {
     idt_set_gate(29, interrupt_handler_29, 0x08, 0b1110);
     idt_set_gate(30, interrupt_handler_30, 0x08, 0b1110);
     idt_set_gate(31, interrupt_handler_31, 0x08, 0b1110);
+
+    // Remap PIC to 0x20 and 0x28
+    pic_remap(PIC1_START_INTERRUPT, PIC2_START_INTERRUPT);
 
     idt_set_gate(32, interrupt_handler_32, 0x08, 0b1110);
     idt_set_gate(33, interrupt_handler_33, 0x08, 0b1110);

@@ -31,13 +31,13 @@ void interrupt_handler(struct cpu_state cpu, int interrupt, struct stack_state s
         asm volatile ("hlt");
     }
     // Call the interrupt handler
-    interrupt_handlers[interrupt](interrupt);
+    interrupt_handlers[interrupt - 32](interrupt);
 }
 
 /** register_interrupt_handler:
  * Stores the function pointer in the interrupt_handlers array at the index corresponding to the given interrupt number.
  *
- * @param interrupt  An interrupt number stored in the Interrupt Descriptor Table
+ * @param interrupt An interrupt number stored in the Interrupt Descriptor Table
  * @param handler   function to handle the given interrupt.
  */
 void register_interrupt_handler(int interrupt, void (*handler)()) {
